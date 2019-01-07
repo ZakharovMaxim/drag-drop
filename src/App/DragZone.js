@@ -64,7 +64,21 @@ export default class DragZone {
   save (btn) {
     btn.disabled = true;
     if (!this.files.length) return;
-    console.log(this.files);
+
+    const xhr = new XMLHttpRequest();
+
+    const json = JSON.stringify({
+      files: this.files
+    });
+
+    xhr.open("POST", 'http://localhost:3000/load', true)
+    xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    xhr.onreadystatechange = e => {
+      console.log(e);
+      if (this.readyState != 4) return;
+    };
+    xhr.send(json);
   }
   removeFile(id) {
     this.files = this.files.filter(file => file.id !== id);
