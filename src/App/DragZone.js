@@ -1,51 +1,72 @@
 import File from './File';
-
+import snackbar from './tools/snackbar'
 export default class DragZone {
   constructor(selector) {
     this.el = document.querySelector(selector);
     this.addListeners();
+    this.fileCounter = 1;
   }
   addListeners() {
     if (!this.el) throw new Error('Element is not found');
-
+    this.dragOverCounter = 0;
     this.el.addEventListener('dragover', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (this.state === 'dragover') return;
       this.setActiveState('dragover')
     })
-    this.el.addEventListener('dragleave', (e) => {
+    this.el.addEventListener('dragenter', (e) => {
       e.preventDefault();
-      e.stopPropagation();
-      this.setDefaultState()
+      this.dragOverCounter++;
+    })
+    this.el.addEventListener('dragleave', (e) => {
+      this.dragOverCounter--;
+      if (this.dragOverCounter === 0) {
+        this.setDefaultState()
+      }
     })
     this.el.addEventListener('drop', (e) => {
       e.preventDefault();
+      e.stopPropagation();
+      this.dragOverCounter = 0;
       for(let i = 0; i < e.dataTransfer.files.length; i++) {
-        if (!File.isValid(e.dataTransfer.files[i])) continue;
+        if (!File.isValid(e.dataTransfer.files[i])) {
+          snackbar.add(`file ${e.dataTransfer.files[i].name} has incorrect format`, 'danger');
+          continue;
+        };
         new File({
-          id: i + 1,
+          id: this.fileCounter++,
           file: e.dataTransfer.files[i],
           maxSize: null,
           renderTo: this.el.querySelector('.dragged'),
           onload: this.newFile.bind(this),
-          onremove: this.removeFile.bind(this)
+          onremove: this.removeFile.bind(this),
+          onloadstart: this.loadStart.bind(this)
         })
       }
       this.setDefaultState()
     })
+    const saveBtn = this.el.querySelector('.drag-save button');
+    if (saveBtn) saveBtn.addEventListener('click', (e) => { this.save(e.target) })
   }
-  newFile(src, name, id) {
+  loadStart() {
+    this.el.classList.add('file-loading');
+  }
+  newFile(name, src, id) {
     if (!this.files) this.files = [];
     this.files.push({
       name,
       src,
       id
     });
+    this.el.classList.remove('file-loading');
     this.el.classList.add('loaded');
   }
+  save (btn) {
+    btn.disabled = true;
+    if (!this.files.length) return;
+    console.log(this.files);
+  }
   removeFile(id) {
-    console.log(this.files, id);
     this.files = this.files.filter(file => file.id !== id);
     if (this.files.length === 0) this.el.classList.remove('loaded');
   }
