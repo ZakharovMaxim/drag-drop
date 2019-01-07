@@ -1,4 +1,4 @@
-import test from './App/test';
+import DragZone from './App/DragZone';
 import './App/styles/index.css';
 
-console.log(test.test);
+const dragZone = new DragZone('.drag');

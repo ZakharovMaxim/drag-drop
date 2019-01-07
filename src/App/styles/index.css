@@ -43,6 +43,7 @@ body {
   flex: 1 0 25%;
   max-width: 25%;
   padding: 0 15px;
+  margin-bottom: 30px;
 }
 .file-thumbnail {
   padding-top: 100%;
@@ -84,6 +85,16 @@ body {
   position: relative;
   border: 1px dashed #ccc;
   margin-top: 30px;
+  padding: 10px;
+}
+.drag.dragover {
+  border-color: #333;
+}
+.drag.dragover .drag-title-arrow {
+  animation: floating 500ms ease-in infinite;
+}
+.drag.loaded .drag-title {
+  display: none;
 }
 .drag-title {
   position: absolute;
@@ -100,8 +111,35 @@ body {
 .drag-title-icon svg {
   width: 50px;
 }
+.drag-save {
+  text-align: center;
+  display: none;
+}
+.drag.loaded .drag-save {
+  display: block;
+}
+.drag-save button {
+  background: transparent;
+  outline: none;
+  border: 1px solid #eee;
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: border-color 200ms;
+}
+.drag-save button:hover {
+  border-color: #ccc;
+}
 /* file-loader */
 .file-loader {
   height: 5px;
   background: #eee;
+}
+@keyframes floating {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
 }
