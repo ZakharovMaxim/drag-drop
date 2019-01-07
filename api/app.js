@@ -8,7 +8,10 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({limit: '150mb'}));
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.get('*', (req, res) => {
+  const filePath = path.join(__dirname, 'index.html');
+  res.sendFile(filePath);
+})
 app.post('/load', (req, res) => {
   let counter = 0;
   let error = null;
