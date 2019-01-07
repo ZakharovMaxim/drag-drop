@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({limit: '150mb'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/load', (req, res) => {

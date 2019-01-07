@@ -93,7 +93,7 @@ body {
 .drag.dragover .drag-title-arrow {
   animation: floating 500ms ease-in infinite;
 }
-.drag.loaded .drag-title, .drag.loading .drag-title {
+.drag.loaded .drag-title, .drag.file-loading .drag-title {
   display: none;
 }
 .drag-title {

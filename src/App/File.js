@@ -2,6 +2,7 @@ import snackbar from './tools/snackbar'
 class File {
   constructor(options) {
     this.id = options.id
+    this.onremove = options.onremove;
     options.maxSize = options.maxSize || 100000000
     const reader = new FileReader()
     reader.readAsDataURL(options.file)
@@ -47,7 +48,7 @@ class File {
   loading(percent) {
     this.loader.style.width = percent + '%'
   }
-  loaded(src, onremove) {
+  loaded(src) {
     const thumbnailBlock = this.el.querySelector('.file-thumbnail')
     thumbnailBlock.innerHTML = `
     <div class="file-remove">
@@ -59,10 +60,11 @@ class File {
   />`
     thumbnailBlock
       .querySelector('.file-remove')
-      .addEventListener('click', () => {
-        this.el.remove()
-        onremove(this.id)
-      })
+      .addEventListener('click', () => this.remove())
+  }
+  remove () {
+    this.el.remove();
+    this.onremove(this.id);
   }
 }
 File.formats = ['jpg', 'jpeg', 'gif', 'png', 'pdf']

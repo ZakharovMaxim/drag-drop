@@ -5,6 +5,7 @@ export default class DragZone {
     this.el = document.querySelector(selector);
     this.addListeners();
     this.fileCounter = 1;
+    this.files = [];
   }
   addListeners() {
     if (!this.el) throw new Error('Element is not found');
@@ -33,7 +34,7 @@ export default class DragZone {
           snackbar.add(`file ${e.dataTransfer.files[i].name} has incorrect format`, 'danger');
           continue;
         };
-        new File({
+        this.files.push(new File({
           id: this.fileCounter++,
           file: e.dataTransfer.files[i],
           maxSize: null,
@@ -41,7 +42,7 @@ export default class DragZone {
           onload: this.newFile.bind(this),
           onremove: this.removeFile.bind(this),
           onloadstart: this.loadStart.bind(this)
-        })
+        }))
       }
       this.setDefaultState()
     })
@@ -52,12 +53,10 @@ export default class DragZone {
     this.el.classList.add('file-loading');
   }
   newFile(name, src, id) {
-    if (!this.files) this.files = [];
-    this.files.push({
-      name,
-      src,
-      id
-    });
+    const file = this.files.find(file => file.id === id);
+    if (!file) return;
+    file.name = name;
+    file.src = src;
     this.el.classList.remove('file-loading');
     this.el.classList.add('loaded');
   }
@@ -68,15 +67,21 @@ export default class DragZone {
     const xhr = new XMLHttpRequest();
 
     const json = JSON.stringify({
-      files: this.files
+      files: this.files.map(file => ({src: file.src, name: file.name}))
     });
 
     xhr.open("POST", 'http://localhost:3000/load', true)
     xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
     xhr.onreadystatechange = e => {
-      console.log(e);
-      if (this.readyState != 4) return;
+      if (xhr.readyState != 4) return;
+      if (xhr.status !== 200) {
+        snackbar.add(`Error: ${xhr.statusText}, try later`, danger);
+      } else {
+        snackbar.add('Files has been upload successfully');
+        btn.disabled = false;
+        this.files.forEach(file => file.remove())
+      }
     };
     xhr.send(json);
   }
